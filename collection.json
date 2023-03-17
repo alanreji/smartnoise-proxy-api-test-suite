@@ -53,24 +53,23 @@
 			"response": []
 		},
 		{
-			"name": "Count query Invalid API key",
+			"name": "Non aggregate query",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
 							"});",
 							"",
 							"pm.test(\"Response should be valid JSON\", function () {",
 							"    pm.response.to.be.json;",
 							"});",
 							"",
-							"pm.test(\"Result should contain result and total_privacy_used\", function () {",
+							"pm.test(\"Result should contain error\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData).to.have.property('result');",
-							"    pm.expect(jsonData).to.have.property('total_privacy_used');",
+							"    pm.expect(jsonData).to.have.property('error');",
 							"});",
 							""
 						],
@@ -79,6 +78,67 @@
 				}
 			],
 			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"query\": \"SELECT name, salary FROM employees;\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}",
+					"host": [
+						"{{base_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Count query Invalid API key",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Response should be valid JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Result should contain error\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('error');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "key",
+							"value": "skjiusjhis",
+							"type": "string"
+						},
+						{
+							"key": "value",
+							"value": "{{api_key}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -106,18 +166,17 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
 							"});",
 							"",
 							"pm.test(\"Response should be valid JSON\", function () {",
 							"    pm.response.to.be.json;",
 							"});",
 							"",
-							"pm.test(\"Result should contain result and total_privacy_used\", function () {",
+							"pm.test(\"Result should contain error\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData).to.have.property('result');",
-							"    pm.expect(jsonData).to.have.property('total_privacy_used');",
+							"    pm.expect(jsonData).to.have.property('error');",
 							"});",
 							""
 						],
@@ -126,6 +185,9 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -201,7 +263,7 @@
 					"script": {
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(500);",
 							"});",
 							"",
 							"pm.test(\"Response should be valid JSON\", function () {",
@@ -210,8 +272,7 @@
 							"",
 							"pm.test(\"Result should contain result and total_privacy_used\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData).to.have.property('result');",
-							"    pm.expect(jsonData).to.have.property('total_privacy_used');",
+							"    pm.expect(jsonData).to.have.property('query error');",
 							"});",
 							""
 						],
@@ -224,7 +285,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"query\": \"SELECT SUM(salary) FROM employees;\"\n}",
+					"raw": "{\n    \"query\": \"SELECT SUM(salary) FROM ;\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -279,7 +340,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://127.0.0.1:5050/",
+			"value": "http://127.0.0.1:5050/runQuery",
 			"type": "default"
 		}
 	]
